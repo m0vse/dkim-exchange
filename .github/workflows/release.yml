@@ -1,4 +1,4 @@
-name: Build & Release DKIM
+name: Build & Release
 
 on:
   push:
@@ -32,21 +32,21 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release
 
       - name: Run tests
         run: dotnet test --configuration Release --no-build --verbosity normal
 
       - name: Publish Configuration.DkimSigner
         run: |
-          dotnet publish Configuration.DkimSigner/Configuration.DkimSigner.csproj `
+          dotnet publish Src/Configuration.DkimSigner/Configuration.DkimSigner.csproj `
             --configuration Release `
             --no-build `
             --output ./publish/Configuration.DkimSigner
 
       - name: Publish ExchangeDkimSigner
         run: |
-          dotnet publish ExchangeDkimSigner/ExchangeDkimSigner.csproj `
+          dotnet publish Src/Exchange.DkimSigner/Exchange.DkimSigner.csproj `
             --configuration Release `
             --no-build `
             --output ./publish/ExchangeDkimSigner
