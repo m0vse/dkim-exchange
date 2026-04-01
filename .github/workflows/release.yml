@@ -22,22 +22,11 @@ jobs:
         with:
           dotnet-version: "8.x"
 
-      - name: Install .NET Framework 4.8 & 4.8.1 Developer Packs
+      - name: Install .NET Framework Developer Packs
         shell: powershell
         run: |
-          # .NET Framework 4.8 Developer Pack
-          $url48 = "https://download.microsoft.com/download/0/2/E/02E9E569-5463-4BC0-9AE0-5E39DE049E88/ndp48-devpack-enu.exe"
-          $installer48 = "$env:TEMP\ndp48-devpack.exe"
-          Invoke-WebRequest -Uri $url48 -OutFile $installer48
-          Start-Process -FilePath $installer48 -ArgumentList "/quiet", "/norestart" -Wait
-          Write-Host ".NET Framework 4.8 Developer Pack installed"
-
-          # .NET Framework 4.8.1 Developer Pack
-          $url481 = "https://download.microsoft.com/download/9/2/4/924d79d4-1c70-4a09-8fd8-e9f44e9f5fc2/ndp481-devpack-enu.exe"
-          $installer481 = "$env:TEMP\ndp481-devpack.exe"
-          Invoke-WebRequest -Uri $url481 -OutFile $installer481
-          Start-Process -FilePath $installer481 -ArgumentList "/quiet", "/norestart" -Wait
-          Write-Host ".NET Framework 4.8.1 Developer Pack installed"
+          choco install netfx-4.8-devpack --yes --no-progress
+          choco install netfx-4.8.1-devpack --yes --no-progress
 
       - name: Restore dependencies
         run: dotnet restore
