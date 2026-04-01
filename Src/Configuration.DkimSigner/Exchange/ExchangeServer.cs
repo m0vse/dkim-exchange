@@ -24,14 +24,15 @@ namespace Configuration.DkimSigner.Exchange
 		{
 			bool result = false;
 
-			// Currently supported by this project:
-			// Exchange 2013 CU23 or later (15.0.1497.2)
-			// Exchange 2016 CU13 or later (15.1.1779.2)
-			// Exchange 2019 RTM or later (15.2.221.12)
-			// Versions of Exchange >= 15.3 should be OK due to stability of Microsoft.Exchange.Data.Common and Microsoft.Exchange.Data.Transport APIs
-			// Versions of Exchange >= 16 are unsupported and require specific support to be added to Exchange.DkimSigner first
+            // Currently supported by this project:
+            // Exchange 2013 CU23 or later (15.0.1497.2)
+            // Exchange 2016 CU13 or later (15.1.1779.2)
+            // Exchange 2019 RTM or later (15.2.221.12)
+            // Exchange SE RTM or later (15.2.2562.17)
+            // Versions of Exchange >= 15.3 should be OK due to stability of Microsoft.Exchange.Data.Common and Microsoft.Exchange.Data.Transport APIs
+            // Versions of Exchange >= 16 are unsupported and require specific support to be added to Exchange.DkimSigner first
 
-			Version minExchange2013 = new Version(15, 0, 1497, 2);
+            Version minExchange2013 = new Version(15, 0, 1497, 2);
 			Version minExchange2016 = new Version(15, 1, 1779, 2);
 			Version minExchange2019 = new Version(15, 2, 221, 12);
 

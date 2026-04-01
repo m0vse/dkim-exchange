@@ -1,0 +1,80 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.x"
+
+      - name: Install .NET Framework 4.8 & 4.8.1 Developer Packs
+        shell: powershell
+        run: |
+          # .NET Framework 4.8 Developer Pack
+          $url48 = "https://download.microsoft.com/download/0/2/E/02E9E569-5463-4BC0-9AE0-5E39DE049E88/ndp48-devpack-enu.exe"
+          $installer48 = "$env:TEMP\ndp48-devpack.exe"
+          Invoke-WebRequest -Uri $url48 -OutFile $installer48
+          Start-Process -FilePath $installer48 -ArgumentList "/quiet", "/norestart" -Wait
+          Write-Host ".NET Framework 4.8 Developer Pack installed"
+
+          # .NET Framework 4.8.1 Developer Pack
+          $url481 = "https://download.microsoft.com/download/9/2/4/924d79d4-1c70-4a09-8fd8-e9f44e9f5fc2/ndp481-devpack-enu.exe"
+          $installer481 = "$env:TEMP\ndp481-devpack.exe"
+          Invoke-WebRequest -Uri $url481 -OutFile $installer481
+          Start-Process -FilePath $installer481 -ArgumentList "/quiet", "/norestart" -Wait
+          Write-Host ".NET Framework 4.8.1 Developer Pack installed"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Publish Configuration.DkimSigner
+        run: |
+          dotnet publish Configuration.DkimSigner/Configuration.DkimSigner.csproj `
+            --configuration Release `
+            --no-build `
+            --output ./publish/Configuration.DkimSigner
+
+      - name: Publish ExchangeDkimSigner
+        run: |
+          dotnet publish ExchangeDkimSigner/ExchangeDkimSigner.csproj `
+            --configuration Release `
+            --no-build `
+            --output ./publish/ExchangeDkimSigner
+
+      - name: Zip artifacts
+        run: |
+          Compress-Archive -Path ./publish/Configuration.DkimSigner/* `
+            -DestinationPath ./publish/Configuration.DkimSigner.zip
+          Compress-Archive -Path ./publish/ExchangeDkimSigner/* `
+            -DestinationPath ./publish/ExchangeDkimSigner.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            ./publish/Configuration.DkimSigner.zip
+            ./publish/ExchangeDkimSigner.zip

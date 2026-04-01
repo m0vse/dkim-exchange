@@ -3,4 +3,4 @@ These files are the lowest common denominator versions of the Microsoft.Exchange
 Do not include in the project build output as the latest versions of both these assemblies are available in the GAC on machines that have Exchange installed.
 
 Current version:
-15.0.1497.2	(Exchange 2013 CU23)
+15.2.2562.37	(Exchange SE)
