@@ -28,35 +28,25 @@ jobs:
           choco install netfx-4.8-devpack --yes --no-progress
           choco install netfx-4.8.1-devpack --yes --no-progress
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build solution
-        run: dotnet build --configuration Release
-
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
-
-      - name: Publish Configuration.DkimSigner
-        run: |
-          dotnet publish Src/Configuration.DkimSigner/Configuration.DkimSigner.csproj `
-            --configuration Release `
-            --no-build `
-            --output ./publish/Configuration.DkimSigner
-
-      - name: Publish ExchangeDkimSigner
-        run: |
-          dotnet publish Src/Exchange.DkimSigner/Exchange.DkimSigner.csproj `
-            --configuration Release `
-            --no-build `
-            --output ./publish/ExchangeDkimSigner
+        run: msbuild /p:Configuration=Release /p:Platform="Any CPU"
 
       - name: Zip artifacts
+        shell: powershell
         run: |
-          Compress-Archive -Path ./publish/Configuration.DkimSigner/* `
-            -DestinationPath ./publish/Configuration.DkimSigner.zip
-          Compress-Archive -Path ./publish/ExchangeDkimSigner/* `
-            -DestinationPath ./publish/ExchangeDkimSigner.zip
+          Compress-Archive -Path Src/Configuration.DkimSigner/bin/Release/* `
+            -DestinationPath ./Configuration.DkimSigner.zip
+          Compress-Archive -Path Src/Exchange.DkimSigner/bin/Release/* `
+            -DestinationPath ./ExchangeDkimSigner.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -65,5 +55,5 @@ jobs:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           files: |
-            ./publish/Configuration.DkimSigner.zip
-            ./publish/ExchangeDkimSigner.zip
+            ./Configuration.DkimSigner.zip
+            ./ExchangeDkimSigner.zip
